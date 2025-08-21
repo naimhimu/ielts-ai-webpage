@@ -17,9 +17,8 @@ function App() {
   const [image, setImage] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
-  // 2. Now a proper click handler
-  const handleSend = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();                     // no more implicit any
+  // 2. Click handler no longer needs an event
+  const handleSend = () => {
     if (!input.trim() && !image) return;
 
     setMessages(prev => [
@@ -36,7 +35,12 @@ function App() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
     const reader = new FileReader();
-    reader.onload = ev => setImage(ev.target?.result as string);
+    reader.onload = (ev: ProgressEvent<FileReader>) => {
+      const result = ev.target?.result;
+      if (typeof result === "string") {
+        setImage(result);
+      }
+    };
     reader.readAsDataURL(e.target.files[0]);
   };
 
@@ -108,7 +112,7 @@ function App() {
         <input
           style={{ flex: 1, padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
           placeholder="Type your message..."
         />
 
@@ -125,6 +129,7 @@ function App() {
             cursor: "pointer"
           }}
           onClick={handleVoiceInput}
+          type="button"
         >
           🎤
         </button>
@@ -150,7 +155,7 @@ function App() {
           </span>
         </label>
 
-        {/* 3. Send button now triggers handleSend with a typed MouseEvent */}
+        {/* 3. Send button calls handleSend; mark as type="button" */}
         <button
           style={{
             marginLeft: 4,
@@ -163,6 +168,7 @@ function App() {
             cursor: "pointer"
           }}
           onClick={handleSend}
+          type="button"
         >
           ➤
         </button>
