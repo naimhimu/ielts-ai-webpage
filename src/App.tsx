@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import Message from './Message';
+import React, { useState } from 'react';
+import Message from './components/Message';
+
+interface ChatMessage {
+  content: string;
+  sender: string;
+}
 
 const Chat = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
 
   // Type the event as a form submit event to satisfy noImplicitAny (TS7006)
