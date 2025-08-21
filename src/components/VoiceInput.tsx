@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 
+const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
 class VoiceInput extends Component {
     state = {
         isListening: false,
         transcript: ''
     };
 
-    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition = new SpeechRecognition();
 
     componentDidMount() {
         this.recognition.interimResults = true;
-        this.recognition.onresult = (event) => {
+        this.recognition.onresult = (event: any) => {
             const transcript = event.results[event.resultIndex][0].transcript;
             this.setState({ transcript });
         };

@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Message from './Message';
 
+interface ChatMessage {
+    content: string;
+    sender: string;
+}
+
 const Chat = () => {
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
 
-    const sendMessage = (e) => {
+    const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (input.trim()) {
             const newMessage = { content: input, sender: 'user' };

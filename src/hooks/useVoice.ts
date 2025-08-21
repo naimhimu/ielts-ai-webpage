@@ -3,15 +3,16 @@ import { useEffect, useState } from 'react';
 const useVoice = () => {
     const [transcript, setTranscript] = useState('');
     const [isListening, setIsListening] = useState(false);
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
 
     useEffect(() => {
         recognition.interimResults = true;
 
-        recognition.onresult = (event) => {
+        recognition.onresult = (event: any) => {
             const currentTranscript = Array.from(event.results)
-                .map(result => result[0])
-                .map(result => result.transcript)
+                .map((result: any) => result[0])
+                .map((result: any) => result.transcript)
                 .join('');
             setTranscript(currentTranscript);
         };
