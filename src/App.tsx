@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import Message from './Message';
+import React, { useState } from 'react';
+import Message from './components/Message';
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
