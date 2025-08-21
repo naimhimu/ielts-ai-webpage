@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import Message from './Message';
+import React, { useState } from 'react';
+import Message from './components/Message';
+import './styles/main.css';
 
-const Chat = () => {
+const App = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
 
@@ -41,4 +42,4 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+export default App;
