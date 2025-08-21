@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'https://api.example.com'; // Replace with your actual API endpoint
 
-export const sendMessageToAI = async (message) => {
+export const sendMessageToAI = async (message: string): Promise<any> => {
     try {
         const response = await axios.post(`${API_URL}/send`, { message });
         return response.data;
@@ -12,7 +12,7 @@ export const sendMessageToAI = async (message) => {
     }
 };
 
-export const uploadPhoto = async (formData) => {
+export const uploadPhoto = async (formData: FormData): Promise<any> => {
     try {
         const response = await axios.post(`${API_URL}/upload`, formData, {
             headers: {
