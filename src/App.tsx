@@ -1,45 +1,42 @@
 import React, { useState, useRef } from "react";
 
-// 1. Define who can send messages and what a Message looks like
+// 1. Define message shape
 type Sender = "user" | "ai";
 
 interface Message {
   sender: Sender;
   text: string;
-  image?: string | null;  // optional image field
+  image?: string | null;
 }
 
 function App() {
-  // 2. Tell React this is a Message[]
   const [messages, setMessages] = useState<Message[]>([
     { sender: "ai", text: "Hello! How can I help you with IELTS today?" }
   ]);
-
   const [input, setInput] = useState("");
   const [image, setImage] = useState<string | null>(null);
-
-  // 3. Type your ref as any SpeechRecognition instance (or null)
   const recognitionRef = useRef<any>(null);
 
-  const handleSend = () => {
+  // 2. Now a proper click handler
+  const handleSend = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();                     // no more implicit any
     if (!input.trim() && !image) return;
 
-    // 4. Now this lines up with the Message interface
-    setMessages([
-      ...messages,
+    setMessages(prev => [
+      ...prev,
       { sender: "user", text: input, image }
     ]);
 
     setInput("");
     setImage(null);
 
-    // TODO: trigger AI reply and setMessages([{ sender: "ai", text: reply }])
+    // TODO: trigger AI reply...
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setImage(ev.target?.result as string);
+    reader.onload = ev => setImage(ev.target?.result as string);
     reader.readAsDataURL(e.target.files[0]);
   };
 
@@ -52,7 +49,6 @@ function App() {
       return;
     }
 
-    // initialize and start recognition
     recognitionRef.current = new SpeechRecognition();
     recognitionRef.current.lang = "en-US";
     recognitionRef.current.onresult = (event: any) => {
@@ -112,9 +108,8 @@ function App() {
         <input
           style={{ flex: 1, padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={e => setInput(e.target.value)}
           placeholder="Type your message..."
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
         />
 
         <button
@@ -155,6 +150,7 @@ function App() {
           </span>
         </label>
 
+        {/* 3. Send button now triggers handleSend with a typed MouseEvent */}
         <button
           style={{
             marginLeft: 4,
