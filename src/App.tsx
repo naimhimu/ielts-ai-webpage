@@ -1,186 +1,44 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from 'react';
+import Message from './Message';
 
-// 1. Define message shape
-type Sender = "user" | "ai";
+const Chat = () => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
 
-interface Message {
-  sender: Sender;
-  text: string;
-  image?: string | null;
-}
-
-function App() {
-  const [messages, setMessages] = useState<Message[]>([
-    { sender: "ai", text: "Hello! How can I help you with IELTS today?" }
-  ]);
-  const [input, setInput] = useState("");
-  const [image, setImage] = useState<string | null>(null);
-  const recognitionRef = useRef<any>(null);
-
-  // 2. Click handler no longer needs an event
-  const handleSend = () => {
-    if (!input.trim() && !image) return;
-
-    setMessages(prev => [
-      ...prev,
-      { sender: "user", text: input, image }
-    ]);
-
-    setInput("");
-    setImage(null);
-
-    // TODO: trigger AI reply...
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
-    const reader = new FileReader();
-    reader.onload = (ev: ProgressEvent<FileReader>) => {
-      const result = ev.target?.result;
-      if (typeof result === "string") {
-        setImage(result);
-      }
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  };
-
-  const handleVoiceInput = () => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Voice input not supported in this browser.");
-      return;
+  // Type the event as a form submit event to satisfy noImplicitAny (TS7006)
+  const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (input.trim()) {
+      const newMessage = { content: input, sender: 'user' };
+      setMessages([...messages, newMessage]);
+      setInput('');
+      // Here you would typically send the message to the AI service and get a response
+      // For now, we'll simulate a response
+      setTimeout(() => {
+        const aiResponse = { content: `AI response to: ${input}`, sender: 'ai' };
+        setMessages((prevMessages) => [...prevMessages, aiResponse]);
+      }, 1000);
     }
-
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.lang = "en-US";
-    recognitionRef.current.onresult = (event: any) => {
-      setInput(event.results[0][0].transcript);
-    };
-    recognitionRef.current.start();
   };
 
   return (
-    <div
-      style={{
-        maxWidth: 500,
-        margin: "40px auto",
-        border: "1px solid #eee",
-        borderRadius: 8,
-        boxShadow: "0 2px 8px #ccc",
-        padding: 24,
-        background: "#fafafa"
-      }}
-    >
-      <h2 style={{ textAlign: "center" }}>IELTS AI Chat</h2>
-
-      <div style={{ minHeight: 300, marginBottom: 16 }}>
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            style={{
-              textAlign: msg.sender === "user" ? "right" : "left",
-              margin: "8px 0"
-            }}
-          >
-            <span
-              style={{
-                display: "inline-block",
-                padding: "8px 16px",
-                borderRadius: 16,
-                background: msg.sender === "user" ? "#d1e7dd" : "#e2e3e5"
-              }}
-            >
-              {msg.text}
-
-              {msg.image && (
-                <div>
-                  <img
-                    src={msg.image}
-                    alt="uploaded"
-                    style={{ maxWidth: 200, marginTop: 8, borderRadius: 8 }}
-                  />
-                </div>
-              )}
-            </span>
-          </div>
+    <div className="chat-container">
+      <div className="chat-history">
+        {messages.map((msg, index) => (
+          <Message key={index} content={msg.content} sender={msg.sender} />
         ))}
       </div>
-
-      <div style={{ display: "flex", alignItems: "center" }}>
+      <form onSubmit={sendMessage} className="chat-input">
         <input
-          style={{ flex: 1, padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+          type="text"
           value={input}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Type your message..."
         />
-
-        <button
-          title="Voice Input"
-          style={{
-            marginLeft: 4,
-            padding: "6px",
-            borderRadius: "50%",
-            border: "none",
-            background: "transparent",
-            color: "#555",
-            fontSize: "18px",
-            cursor: "pointer"
-          }}
-          onClick={handleVoiceInput}
-          type="button"
-        >
-          🎤
-        </button>
-
-        <label style={{ marginLeft: 4, cursor: "pointer" }}>
-          <input
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleImageChange}
-          />
-          <span
-            style={{
-              display: "inline-block",
-              padding: "6px",
-              borderRadius: "50%",
-              background: "transparent",
-              color: "#555",
-              fontSize: "18px"
-            }}
-          >
-            🖼️
-          </span>
-        </label>
-
-        {/* 3. Send button calls handleSend; mark as type="button" */}
-        <button
-          style={{
-            marginLeft: 4,
-            padding: "6px 12px",
-            borderRadius: 8,
-            border: "none",
-            background: "transparent",
-            color: "#0d6efd",
-            fontWeight: "bold",
-            cursor: "pointer"
-          }}
-          onClick={handleSend}
-          type="button"
-        >
-          ➤
-        </button>
-      </div>
-
-      {image && (
-        <div style={{ marginTop: 8 }}>
-          <img src={image} alt="preview" style={{ maxWidth: 100, borderRadius: 8 }} />
-        </div>
-      )}
+        <button type="submit">Send</button>
+      </form>
     </div>
   );
-}
+};
 
-export default App;
+export default Chat;
